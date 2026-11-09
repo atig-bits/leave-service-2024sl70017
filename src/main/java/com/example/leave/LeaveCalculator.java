@@ -31,5 +31,7 @@ public class LeaveCalculator {
 
         return remainingLeave * dailySalary;
     }
+
+    //Trigger the Poll from Git by Jenkins
 }
 
