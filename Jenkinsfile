@@ -80,6 +80,34 @@ pipeline {
                 '''
             }
         }
+
+        stage('Manual Approval') {
+            steps {
+                input message: 'Approve deployment to Production?',
+                      ok: 'Approve and Deploy'
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying application to production...'
+                sh '''
+                    docker rm -f leave-service-production || true
+
+                    docker run -d \
+                      --name leave-service-production \
+                      -e APP_ENV=production \
+                      -p 8086:8080 \
+                      leave-service-2024sl70017:v2
+
+                    sleep 3
+                    curl --fail http://localhost:8086
+
+                    echo "Docker containers running:"
+                    docker ps
+                '''
+            }
+        }
     }
 }
 
