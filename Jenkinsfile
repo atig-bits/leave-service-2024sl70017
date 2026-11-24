@@ -54,6 +54,32 @@ pipeline {
                 }
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh '''
+                    docker build -t leave-service-2024sl70017:v2 .
+                '''
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying application to staging...'
+                sh '''
+                    docker rm -f leave-service-staging || true
+
+                    docker run -d \
+                      --name leave-service-staging \
+                      -e APP_ENV=staging \
+                      -p 8085:8080 \
+                      leave-service-2024sl70017:v2
+
+                    sleep 3
+                    curl --fail http://localhost:8085
+                '''
+            }
+        }
     }
 }
 
